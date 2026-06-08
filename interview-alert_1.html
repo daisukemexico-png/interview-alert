@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面接アラートシステム</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a3d;
+    --accent: #ff4444;
+    --accent2: #ff8c00;
+    --ok: #00d084;
+    --text: #e8e8f0;
+    --text-dim: #8080a0;
+    --warn: #ffcc00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Header ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+  .live-clock {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    color: var(--ok);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── Main layout ── */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 0;
+  }
+
+  /* ── Sidebar (設定) ── */
+  aside {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+  }
+  .section-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+  input[type="text"], input[type="time"], input[type="url"], textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .form-row { margin-bottom: 14px; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .toggle-label { font-size: 13px; }
+  .toggle {
+    width: 40px; height: 22px;
+    background: var(--border);
+    border-radius: 11px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle.on { background: var(--ok); }
+  .toggle::after {
+    content: '';
+    position: absolute;
+    width: 16px; height: 16px;
+    background: white;
+    border-radius: 50%;
+    top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(18px); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    width: 100%;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-primary:hover { background: #ff2222; transform: translateY(-1px); }
+  .btn-ok {
+    background: var(--ok);
+    color: #001a0a;
+  }
+  .btn-ok:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover { border-color: var(--text-dim); }
+
+  /* ── Schedule Panel ── */
+  .content {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .schedule-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .schedule-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--text-dim);
+    transition: background 0.2s;
+  }
+  .schedule-card.active::before { background: var(--ok); }
+  .schedule-card.warning::before { background: var(--warn); }
+  .schedule-card.danger::before { background: var(--accent); }
+  .schedule-card:hover { border-color: var(--text-dim); transform: translateY(-2px); }
+  .schedule-card.selected { border-color: var(--accent); }
+
+  .card-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .card-name { font-size: 13px; color: var(--text-dim); margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-status {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: var(--surface2);
+    color: var(--text-dim);
+  }
+  .card-status.ok { background: rgba(0,208,132,0.15); color: var(--ok); }
+  .card-status.warn { background: rgba(255,204,0,0.15); color: var(--warn); }
+  .card-status.danger { background: rgba(255,68,68,0.15); color: var(--accent); }
+  .card-delete {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .schedule-card:hover .card-delete { opacity: 1; }
+  .card-delete:hover { color: var(--accent); }
+
+  /* ── Timeline ── */
+  .timeline {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .timeline-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .timeline-bar {
+    position: relative;
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .timeline-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s linear, background 0.3s;
+    background: var(--ok);
+  }
+  .timeline-markers {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .countdown-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    text-align: center;
+    padding: 20px 0;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .countdown-display.ok { color: var(--ok); }
+  .countdown-display.warn { color: var(--warn); }
+  .countdown-display.danger { color: var(--accent); }
+
+  /* ── Log ── */
+  .log-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  .log-entry {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-time { font-family: 'JetBrains Mono', monospace; color: var(--text-dim); flex-shrink: 0; }
+  .log-msg { color: var(--text); }
+  .log-entry.ok .log-msg { color: var(--ok); }
+  .log-entry.warn .log-msg { color: var(--warn); }
+  .log-entry.danger .log-msg { color: var(--accent); }
+
+  /* ── ALERT OVERLAY ── */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+
+  .overlay-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+  }
+  .alert-box {
+    position: relative;
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 460px;
+    width: 90%;
+    border: 1px solid var(--border);
+    animation: alertIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    text-align: center;
+  }
+  .alert-box.shake {
+    animation: shake 0.5s ease;
+  }
+  @keyframes alertIn {
+    from { opacity: 0; transform: scale(0.8) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-12px); }
+    40% { transform: translateX(12px); }
+    60% { transform: translateX(-8px); }
+    80% { transform: translateX(8px); }
+  }
+  @keyframes pulse-red {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,68,68,0.4); }
+    50% { box-shadow: 0 0 0 20px rgba(255,68,68,0); }
+  }
+  .alert-box.urgent { animation: alertIn 0.3s cubic-bezier(0.34,1.56,0.64,1), pulse-red 1s infinite 0.3s; }
+
+  .alert-icon { font-size: 56px; margin-bottom: 16px; }
+  .alert-level {
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .alert-level.warn { background: rgba(255,204,0,0.2); color: var(--warn); }
+  .alert-level.danger { background: rgba(255,68,68,0.2); color: var(--accent); }
+  .alert-level.critical { background: var(--accent); color: white; }
+
+  .alert-title {
+    font-size: 24px;
+    font-weight: 900;
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+  .alert-subtitle {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+  .alert-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-entered {
+    background: var(--ok);
+    color: #001a0a;
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 900;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .btn-entered:hover { filter: brightness(1.15); transform: translateY(-2px); }
+  .btn-snooze {
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 13px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  .btn-snooze:hover { border-color: var(--text-dim); color: var(--text); }
+  .snooze-count { font-size: 11px; color: var(--text-dim); }
+
+  /* ── Bomb alert ── */
+  .bomb-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: var(--accent);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 20px;
+    animation: bombPulse 0.5s infinite;
+  }
+  .bomb-overlay.show { display: flex; }
+  @keyframes bombPulse {
+    0%,100% { background: var(--accent); }
+    50% { background: #cc0000; }
+  }
+  .bomb-text {
+    font-size: 36px;
+    font-weight: 900;
+    color: white;
+    text-align: center;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .bomb-sub {
+    font-size: 16px;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+  }
+  .btn-bomb-ok {
+    background: white;
+    color: var(--accent);
+    font-size: 18px;
+    font-weight: 900;
+    padding: 16px 40px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    animation: btnBounce 0.5s infinite alternate;
+  }
+  @keyframes btnBounce {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--ok);
+    flex-shrink: 0;
+  }
+  .status-dot.inactive { background: var(--text-dim); }
+
+  .add-schedule-form {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  .add-schedule-form h3 {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .form-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 10px;
+    align-items: end;
+  }
+  .btn-add {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .btn-add:hover { background: #ff2222; }
+
+  .no-schedule {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+    aside { border-right: none; border-bottom: 1px solid var(--border); }
+    .form-inline { grid-template-columns: 1fr 1fr; }
+    .form-inline .btn-add { grid-column: 1/-1; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🎯</div>
+    面接アラートシステム
+  </div>
+  <div class="live-clock" id="liveClock">--:--:--</div>
+</header>
+
+<main>
+  <!-- Sidebar: Settings -->
+  <aside>
+    <div>
+      <div class="section-title">⚙ Discord 設定</div>
+      <div class="form-row">
+        <label>Webhook URL</label>
+        <input type="url" id="slackWebhook" placeholder="https://discord.com/api/webhooks/..." />
+      </div>
+      <div class="form-row">
+        <label>上長の Discord メンション（例: @yamada または &lt;@123456789&gt;）</label>
+        <input type="text" id="managerMention" placeholder="@上長の名前" value="@上長" />
+      </div>
+      <div class="form-row">
+        <label>自分の名前</label>
+        <input type="text" id="myName" placeholder="山田 太郎" value="" />
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">🔔 アラート設定</div>
+      <div class="toggle-row">
+        <span class="toggle-label">3分前アラート</span>
+        <div class="toggle on" id="toggle3min" onclick="toggleSetting(this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">1分前アラート</span>
+        <div class="toggle on" id="toggle1min" onclick="toggleSetting(this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">未入室 +3分 Slack通知</span>
+        <div class="toggle on" id="toggle3after" onclick="toggleSetting(this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">未入室 +5分 爆音アラート</span>
+        <div class="toggle on" id="toggle5after" onclick="toggleSetting(this)"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-title">📋 入室メッセージ</div>
+      <div class="form-row">
+        <label>入室完了時のSlackメッセージ</label>
+        <textarea id="enteredMsg" rows="3" placeholder="面接室に入室しました ✅">面接室に入室しました ✅</textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="testSlack()">Discord 接続テスト</button>
+  </aside>
+
+  <!-- Main content -->
+  <div class="content">
+    <!-- Add schedule -->
+    <div class="add-schedule-form">
+      <h3>＋ 面接スケジュール追加</h3>
+      <div class="form-inline">
+        <div>
+          <label>時刻</label>
+          <input type="time" id="newTime" />
+        </div>
+        <div>
+          <label>候補者名（任意）</label>
+          <input type="text" id="newName" placeholder="例: 田中 一郎" />
+        </div>
+        <button class="btn-add" onclick="addSchedule()">追加</button>
+      </div>
+    </div>
+
+    <!-- Countdown for next interview -->
+    <div class="timeline" id="countdownSection" style="display:none">
+      <div class="timeline-title">📌 次の面接まで</div>
+      <div class="countdown-display ok" id="countdownDisplay">--:--</div>
+      <div class="timeline-bar">
+        <div class="timeline-fill" id="timelineFill" style="width:100%"></div>
+      </div>
+      <div class="timeline-markers">
+        <span id="tlStart">--:--</span>
+        <span style="color:var(--warn)">−3分</span>
+        <span style="color:var(--accent)">−1分</span>
+        <span id="tlEnd">--:--</span>
+      </div>
+    </div>
+
+    <!-- Schedule cards -->
+    <div>
+      <div class="section-title" style="padding:0 0 10px">📅 本日のスケジュール</div>
+      <div class="schedule-grid" id="scheduleGrid">
+        <div class="no-schedule">面接スケジュールを追加してください</div>
+      </div>
+    </div>
+
+    <!-- Log -->
+    <div class="log-panel" id="logPanel">
+      <div class="section-title" style="margin-bottom:8px">📝 ログ</div>
+      <div id="logEntries"></div>
+    </div>
+  </div>
+</main>
+
+<div class="status-bar">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">待機中 — 面接スケジュールを追加してください</span>
+</div>
+
+<!-- Alert overlay -->
+<div class="overlay" id="alertOverlay">
+  <div class="overlay-bg"></div>
+  <div class="alert-box" id="alertBox">
+    <div class="alert-icon" id="alertIcon">⏰</div>
+    <div class="alert-level warn" id="alertLevel">注意</div>
+    <div class="alert-title" id="alertTitle">面接3分前です</div>
+    <div class="alert-subtitle" id="alertSubtitle">面接室への移動を開始してください</div>
+    <div class="alert-buttons">
+      <button class="btn-entered" id="btnEntered" onclick="markEntered()">✅ 入室した</button>
+      <button class="btn-snooze" onclick="snooze()">⏱ 1分スヌーズ <span class="snooze-count" id="snoozeCount">(残り3回)</span></button>
+      <button class="btn-snooze" onclick="dismissAlert()">✕ 閉じる</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bomb overlay (5min late) -->
+<div class="bomb-overlay" id="bombOverlay">
+  <div style="font-size:80px">🚨</div>
+  <div class="bomb-text" id="bombText">面接開始から5分経過！<br>至急確認してください！！</div>
+  <div class="bomb-sub" id="bombSub">上長・メンバーへの緊急連絡を送信しました</div>
+  <button class="btn-bomb-ok" onclick="dismissBomb()">確認しました</button>
+</div>
+
+<audio id="alertSound"></audio>
+
+<script>
+// ─── State ───────────────────────────────────────────
+let schedules = [];
+let activeAlerts = {};  // scheduleId -> {snoozeCount, enteredAt, alert3fired, alert1fired, late3fired, late5fired}
+let snoozeTimeouts = {};
+let tickInterval;
+let bombAudio = null;
+let snoozeCountLeft = 3;
+
+// ─── Clock ───────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  document.getElementById('liveClock').textContent = now.toLocaleTimeString('ja-JP');
+  checkSchedules();
+  updateCountdown();
+  updateCardStatuses();
+}
+
+// ─── Schedule management ──────────────────────────────
+function addSchedule() {
+  const timeInput = document.getElementById('newTime').value;
+  const nameInput = document.getElementById('newName').value.trim();
+
+  if (!timeInput) { showToast('時刻を入力してください', 'warn'); return; }
+
+  const id = Date.now();
+  schedules.push({
+    id,
+    time: timeInput,
+    name: nameInput || '面接',
+    entered: false
+  });
+  activeAlerts[id] = { snoozeCount: 0, enteredAt: null, alert3fired: false, alert1fired: false, late3fired: false, late5fired: false };
+
+  document.getElementById('newTime').value = '';
+  document.getElementById('newName').value = '';
+
+  schedules.sort((a,b) => a.time.localeCompare(b.time));
+  renderSchedules();
+  addLog(`「${nameInput || '面接'}」${timeInput} を追加しました`, 'ok');
+  saveState();
+}
+
+function removeSchedule(id) {
+  schedules = schedules.filter(s => s.id !== id);
+  delete activeAlerts[id];
+  renderSchedules();
+  saveState();
+}
+
+function renderSchedules() {
+  const grid = document.getElementById('scheduleGrid');
+  if (schedules.length === 0) {
+    grid.innerHTML = '<div class="no-schedule">面接スケジュールを追加してください</div>';
+    document.getElementById('countdownSection').style.display = 'none';
+    document.getElementById('statusDot').className = 'status-dot inactive';
+    document.getElementById('statusText').textContent = '待機中 — 面接スケジュールを追加してください';
+    return;
+  }
+
+  grid.innerHTML = schedules.map(s => {
+    const state = activeAlerts[s.id] || {};
+    let statusClass = '', statusLabel = '待機中';
+    if (s.entered) { statusClass = 'ok'; statusLabel = '入室済み ✅'; }
+
+    return `
+      <div class="schedule-card ${s.entered ? 'active' : ''}" id="card-${s.id}">
+        <button class="card-delete" onclick="removeSchedule(${s.id})" title="削除">✕</button>
+        <div class="card-time">${s.time}</div>
+        <div class="card-name">${s.name}</div>
+        <span class="card-status ${statusClass}">${statusLabel}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function updateCardStatuses() {
+  const now = getNowMinutes();
+  schedules.forEach(s => {
+    const card = document.getElementById(`card-${s.id}`);
+    if (!card) return;
+    const sm = timeToMinutes(s.time);
+    const diff = sm - now;
+    const statusEl = card.querySelector('.card-status');
+    if (s.entered) {
+      statusEl.className = 'card-status ok';
+      statusEl.textContent = '入室済み ✅';
+      card.className = 'schedule-card active';
+    } else if (diff < 0) {
+      statusEl.className = 'card-status danger';
+      statusEl.textContent = `+${Math.abs(Math.floor(diff))}分経過`;
+      card.className = 'schedule-card danger';
+    } else if (diff <= 3) {
+      statusEl.className = 'card-status warn';
+      statusEl.textContent = `あと${Math.floor(diff)}分`;
+      card.className = 'schedule-card warning';
+    } else {
+      statusEl.className = 'card-status';
+      statusEl.textContent = `あと${Math.floor(diff)}分`;
+      card.className = 'schedule-card';
+    }
+  });
+}
+
+// ─── Time utils ───────────────────────────────────────
+function getNowMinutes() {
+  const now = new Date();
+  return now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
+}
+
+function timeToMinutes(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function formatCountdown(diffMinutes) {
+  const totalSeconds = Math.round(diffMinutes * 60);
+  if (totalSeconds < 0) {
+    const abs = Math.abs(totalSeconds);
+    return `-${String(Math.floor(abs/60)).padStart(2,'0')}:${String(abs%60).padStart(2,'0')}`;
+  }
+  return `${String(Math.floor(totalSeconds/60)).padStart(2,'0')}:${String(totalSeconds%60).padStart(2,'0')}`;
+}
+
+// ─── Countdown ────────────────────────────────────────
+function updateCountdown() {
+  const now = getNowMinutes();
+  const upcoming = schedules.filter(s => !s.entered && timeToMinutes(s.time) >= now - 30);
+  if (upcoming.length === 0) {
+    document.getElementById('countdownSection').style.display = 'none';
+    return;
+  }
+
+  const next = upcoming.reduce((a,b) => timeToMinutes(a.time) < timeToMinutes(b.time) ? a : b);
+  const sm = timeToMinutes(next.time);
+  const diff = sm - now;
+
+  document.getElementById('countdownSection').style.display = '';
+  document.getElementById('tlStart').textContent = (() => { const t = new Date(); t.setHours(Math.floor(sm-30), (sm-30)%60*60%60,0); return `${String(Math.floor((sm-30)/60)).padStart(2,'0')}:${String(Math.floor((sm-30)%60)).padStart(2,'0')}`; })();
+  document.getElementById('tlEnd').textContent = next.time;
+
+  const countEl = document.getElementById('countdownDisplay');
+  countEl.textContent = formatCountdown(diff);
+
+  if (diff < 0) { countEl.className = 'countdown-display danger'; }
+  else if (diff <= 1) { countEl.className = 'countdown-display danger'; }
+  else if (diff <= 3) { countEl.className = 'countdown-display warn'; }
+  else { countEl.className = 'countdown-display ok'; }
+
+  // timeline fill (30min window)
+  const windowMin = 30;
+  const elapsed = windowMin - diff;
+  const pct = Math.max(0, Math.min(100, (elapsed / windowMin) * 100));
+  const fill = document.getElementById('timelineFill');
+  fill.style.width = pct + '%';
+  if (diff < 0) fill.style.background = 'var(--accent)';
+  else if (diff <= 3) fill.style.background = 'var(--warn)';
+  else fill.style.background = 'var(--ok)';
+}
+
+// ─── Alert checks ─────────────────────────────────────
+function checkSchedules() {
+  const now = getNowMinutes();
+  schedules.forEach(s => {
+    if (s.entered) return;
+    const state = activeAlerts[s.id];
+    if (!state) return;
+    const sm = timeToMinutes(s.time);
+    const diff = sm - now;  // positive = future, negative = past
+
+    // 3分前
+    if (!state.alert3fired && diff <= 3 && diff > 1 && document.getElementById('toggle3min').classList.contains('on')) {
+      state.alert3fired = true;
+      snoozeCountLeft = 3;
+      showAlert(s, 'warn3', diff);
+    }
+    // 1分前
+    if (!state.alert1fired && diff <= 1 && diff > -0.1 && document.getElementById('toggle1min').classList.contains('on')) {
+      state.alert1fired = true;
+      snoozeCountLeft = 2;
+      showAlert(s, 'warn1', diff);
+    }
+    // +3分経過 (遅刻)
+    if (!state.late3fired && diff <= -3 && diff > -5 && document.getElementById('toggle3after').classList.contains('on')) {
+      state.late3fired = true;
+      showAlert(s, 'late3', diff);
+      sendSlack(s, 'late3');
+    }
+    // +5分経過 (爆音)
+    if (!state.late5fired && diff <= -5 && document.getElementById('toggle5after').classList.contains('on')) {
+      state.late5fired = true;
+      showBomb(s);
+      sendSlack(s, 'late5');
+    }
+  });
+}
+
+// ─── Alert display ────────────────────────────────────
+let currentAlertSchedule = null;
+let currentAlertType = null;
+
+function showAlert(schedule, type, diff) {
+  currentAlertSchedule = schedule;
+  currentAlertType = type;
+
+  const box = document.getElementById('alertBox');
+  const icon = document.getElementById('alertIcon');
+  const level = document.getElementById('alertLevel');
+  const title = document.getElementById('alertTitle');
+  const sub = document.getElementById('alertSubtitle');
+  const snoozeBtn = document.querySelector('.btn-snooze');
+  const enteredBtn = document.getElementById('btnEntered');
+
+  box.className = 'alert-box';
+
+  if (type === 'warn3') {
+    icon.textContent = '⏰';
+    level.className = 'alert-level warn'; level.textContent = '3分前';
+    title.textContent = `「${schedule.name}」まで3分前`;
+    sub.textContent = '面接室への移動を開始してください。\n準備はできていますか？';
+    enteredBtn.style.display = 'block';
+    snoozeBtn.style.display = 'block';
+    playBeep(440, 0.5, 2);
+  } else if (type === 'warn1') {
+    icon.textContent = '🚨';
+    level.className = 'alert-level danger'; level.textContent = '1分前';
+    title.textContent = `「${schedule.name}」まで1分前！`;
+    sub.textContent = '今すぐ面接室に向かってください！';
+    box.className = 'alert-box urgent';
+    enteredBtn.style.display = 'block';
+    snoozeBtn.style.display = 'none';
+    playBeep(880, 0.8, 3);
+  } else if (type === 'late3') {
+    icon.textContent = '❗';
+    level.className = 'alert-level critical'; level.textContent = '遅刻 +3分';
+    title.textContent = `「${schedule.name}」開始から3分経過`;
+    sub.textContent = 'Slack で上長・メンバーへ通知しました。\n至急入室してください。';
+    box.className = 'alert-box urgent';
+    enteredBtn.style.display = 'block';
+    snoozeBtn.style.display = 'none';
+    playBeep(220, 1.0, 5);
+  }
+
+  document.getElementById('snoozeCount').textContent = `(残り${snoozeCountLeft}回)`;
+  document.getElementById('alertOverlay').classList.add('show');
+  addLog(`アラート表示: ${title.textContent}`, type === 'warn3' ? 'warn' : 'danger');
+}
+
+function dismissAlert() {
+  document.getElementById('alertOverlay').classList.remove('show');
+  currentAlertSchedule = null;
+  currentAlertType = null;
+}
+
+function markEntered() {
+  if (!currentAlertSchedule) return;
+  const s = currentAlertSchedule;
+  s.entered = true;
+  dismissAlert();
+  renderSchedules();
+  addLog(`「${s.name}」入室完了 ✅`, 'ok');
+  sendSlack(s, 'entered');
+  saveState();
+  showToast('入室完了を記録しました ✅', 'ok');
+}
+
+function snooze() {
+  if (snoozeCountLeft <= 0) {
+    showToast('スヌーズ回数の上限に達しました', 'warn');
+    return;
+  }
+  snoozeCountLeft--;
+  dismissAlert();
+  const s = currentAlertSchedule;
+  const type = currentAlertType;
+  addLog(`スヌーズ (残り${snoozeCountLeft}回)`, 'warn');
+  setTimeout(() => {
+    if (s && !s.entered) {
+      showAlert(s, type, 0);
+    }
+  }, 60 * 1000);
+  showToast(`1分後に再アラートします（残り${snoozeCountLeft}回）`, 'warn');
+}
+
+// ─── Bomb alert ───────────────────────────────────────
+function showBomb(schedule) {
+  document.getElementById('bombText').innerHTML = `「${schedule.name}」開始から5分経過！！<br>至急確認してください！！`;
+  document.getElementById('bombSub').textContent = '上長・メンバーへの緊急連絡を送信しました';
+  document.getElementById('bombOverlay').classList.add('show');
+  addLog(`🚨 爆音アラート: 「${schedule.name}」+5分経過`, 'danger');
+  startBombSound();
+}
+
+function dismissBomb() {
+  document.getElementById('bombOverlay').classList.remove('show');
+  stopBombSound();
+  // also show regular alert for entered button
+  if (currentAlertSchedule) {
+    showAlert(currentAlertSchedule, 'late3', -5);
+  }
+}
+
+// ─── Sound ───────────────────────────────────────────
+let audioCtx = null;
+let bombNodes = [];
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playBeep(freq, vol, times) {
+  try {
+    const ctx = getAudioCtx();
+    for (let i = 0; i < times; i++) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(vol, ctx.currentTime + i * 0.4);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.4 + 0.3);
+      osc.start(ctx.currentTime + i * 0.4);
+      osc.stop(ctx.currentTime + i * 0.4 + 0.3);
+    }
+  } catch(e) {}
+}
+
+function startBombSound() {
+  try {
+    const ctx = getAudioCtx();
+    const freqs = [220, 440, 880, 660];
+    let i = 0;
+    function beepLoop() {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.frequency.value = freqs[i % freqs.length];
+      gain.gain.setValueAtTime(1.0, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.2);
+      i++;
+      if (document.getElementById('bombOverlay').classList.contains('show')) {
+        bombNodes.push(setTimeout(beepLoop, 250));
+      }
+    }
+    beepLoop();
+  } catch(e) {}
+}
+
+function stopBombSound() {
+  bombNodes.forEach(clearTimeout);
+  bombNodes = [];
+}
+
+// ─── Slack ────────────────────────────────────────────
+async function sendSlack(schedule, type) {
+  const webhook = document.getElementById('slackWebhook').value.trim();
+  const manager = document.getElementById('managerMention').value.trim() || '@上長';
+  const myName = document.getElementById('myName').value.trim() || '担当者';
+  const enteredMsg = document.getElementById('enteredMsg').value.trim();
+
+  let content = '';
+  let color = 0x00d084;
+  let title = '';
+  let description = '';
+
+  if (type === 'entered') {
+    title = '✅ 入室完了';
+    description = `**${myName}** が「${schedule.name}」(${schedule.time}) に入室しました。\n${enteredMsg}`;
+    color = 0x00d084;
+    content = manager;
+  } else if (type === 'late3') {
+    title = '⚠️ 遅刻 +3分';
+    description = `**${myName}** が「${schedule.name}」(${schedule.time}) にまだ入室していません。ご確認ください。`;
+    color = 0xffcc00;
+    content = manager;
+  } else if (type === 'late5') {
+    title = '🚨 緊急 — 遅刻 +5分';
+    description = `**${myName}** が「${schedule.name}」(${schedule.time}) に入室していません！至急確認が必要です！`;
+    color = 0xff4444;
+    content = manager;
+  }
+
+  addLog(`Discord送信: ${title}`, type === 'entered' ? 'ok' : 'danger');
+
+  if (!webhook) {
+    addLog('⚠ Webhook URLが未設定のため、Discord送信はスキップ', 'warn');
+    return;
+  }
+
+  const body = {
+    content,
+    embeds: [{
+      title,
+      description,
+      color,
+      timestamp: new Date().toISOString(),
+      footer: { text: '面接アラートシステム' }
+    }]
+  };
+
+  try {
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok || res.status === 204) {
+      addLog('Discord送信成功 ✅', 'ok');
+      showToast('Discordに通知しました', 'ok');
+    } else {
+      addLog(`Discord送信失敗: ${res.status}`, 'danger');
+      showToast('Discord送信失敗', 'danger');
+    }
+  } catch(e) {
+    addLog(`Discord送信エラー: ${e.message}`, 'danger');
+    showToast('Discord送信エラー (URL確認)', 'danger');
+  }
+}
+
+async function testSlack() {
+  const webhook = document.getElementById('slackWebhook').value.trim();
+  if (!webhook) { showToast('Webhook URLを入力してください', 'warn'); return; }
+  const myName = document.getElementById('myName').value.trim() || '担当者';
+  try {
+    const res = await fetch(webhook, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        content: '接続テスト',
+        embeds: [{
+          title: '✅ 接続テスト成功',
+          description: `面接アラートシステムから送信 (${myName})`,
+          color: 0x00d084,
+          timestamp: new Date().toISOString(),
+          footer: { text: '面接アラートシステム' }
+        }]
+      })
+    });
+    if (res.ok || res.status === 204) {
+      showToast('テスト送信しました ✅', 'ok');
+      addLog('Discordテスト送信成功', 'ok');
+    } else {
+      showToast(`送信失敗: ${res.status}`, 'danger');
+    }
+  } catch(e) {
+    showToast('送信失敗: ' + e.message, 'danger');
+  }
+}
+
+// ─── Toggle ───────────────────────────────────────────
+function toggleSetting(el) {
+  el.classList.toggle('on');
+}
+
+// ─── Log ─────────────────────────────────────────────
+function addLog(msg, type = '') {
+  const now = new Date().toLocaleTimeString('ja-JP');
+  const entries = document.getElementById('logEntries');
+  const div = document.createElement('div');
+  div.className = `log-entry ${type}`;
+  div.innerHTML = `<span class="log-time">${now}</span><span class="log-msg">${msg}</span>`;
+  entries.prepend(div);
+  if (entries.children.length > 50) entries.removeChild(entries.lastChild);
+}
+
+// ─── Toast ───────────────────────────────────────────
+let toastTimeout;
+function showToast(msg, type) {
+  let toast = document.getElementById('toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    toast.style.cssText = `
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+      background:var(--surface2); border:1px solid var(--border);
+      padding:10px 20px; border-radius:8px; font-size:13px;
+      z-index:9999; transition:opacity 0.3s; color:var(--text);
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  toast.style.borderColor = type === 'ok' ? 'var(--ok)' : type === 'danger' ? 'var(--accent)' : 'var(--warn)';
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.style.opacity = '0', 3000);
+}
+
+// ─── Persist ─────────────────────────────────────────
+function saveState() {
+  try {
+    sessionStorage.setItem('ias_schedules', JSON.stringify(schedules.map(s => ({...s, id: s.id}))));
+    sessionStorage.setItem('ias_webhook', document.getElementById('slackWebhook').value);
+    sessionStorage.setItem('ias_manager', document.getElementById('managerMention').value);
+    sessionStorage.setItem('ias_name', document.getElementById('myName').value);
+  } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const saved = sessionStorage.getItem('ias_schedules');
+    if (saved) {
+      schedules = JSON.parse(saved);
+      schedules.forEach(s => {
+        if (!activeAlerts[s.id]) {
+          activeAlerts[s.id] = { snoozeCount: 0, enteredAt: null, alert3fired: false, alert1fired: false, late3fired: false, late5fired: false };
+        }
+      });
+      renderSchedules();
+    }
+    const wh = sessionStorage.getItem('ias_webhook');
+    const mg = sessionStorage.getItem('ias_manager');
+    const nm = sessionStorage.getItem('ias_name');
+    if (wh) document.getElementById('slackWebhook').value = wh;
+    if (mg) document.getElementById('managerMention').value = mg;
+    if (nm) document.getElementById('myName').value = nm;
+  } catch(e) {}
+}
+
+// ─── Status bar update ────────────────────────────────
+function updateStatus() {
+  const now = getNowMinutes();
+  const next = schedules.filter(s => !s.entered).find(s => timeToMinutes(s.time) >= now - 1);
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  if (!next) {
+    dot.className = 'status-dot inactive';
+    text.textContent = schedules.length > 0 ? '本日の面接はすべて完了' : '待機中 — 面接スケジュールを追加してください';
+    return;
+  }
+  const diff = timeToMinutes(next.time) - now;
+  dot.className = 'status-dot';
+  if (diff <= 1) { dot.style.background = 'var(--accent)'; text.textContent = `🚨 「${next.name}」まもなく開始！`; }
+  else if (diff <= 3) { dot.style.background = 'var(--warn)'; text.textContent = `⚠️ 「${next.name}」まで約${Math.ceil(diff)}分`; }
+  else { dot.style.background = 'var(--ok)'; text.textContent = `次の面接: 「${next.name}」${next.time} (あと${Math.floor(diff)}分)`; }
+}
+
+// ─── Auto-add today demo (dev helper) ─────────────────
+// Optionally pre-fill next 30min slot for demo
+function prefillDemo() {
+  const now = new Date();
+  const next = new Date(now);
+  next.setMinutes(Math.ceil(now.getMinutes() / 30) * 30, 0, 0);
+  document.getElementById('newTime').value = `${String(next.getHours()).padStart(2,'0')}:${String(next.getMinutes()).padStart(2,'0')}`;
+  document.getElementById('newName').value = '田中 一郎（新卒候補）';
+}
+
+// ─── Init ─────────────────────────────────────────────
+loadState();
+prefillDemo();
+tickInterval = setInterval(() => { updateClock(); updateStatus(); }, 1000);
+updateClock();
+addLog('システム起動', 'ok');
+</script>
+</body>
+</html>
