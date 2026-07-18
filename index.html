@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>面接アラートシステム</title>
+<title>面接アラートシステム 2.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -18,9 +18,9 @@
     --text-dim: #7a828f;
     --warn: #d97706;
   }
- 
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
   body {
     background: var(--bg);
     color: var(--text);
@@ -29,7 +29,7 @@
     display: flex;
     flex-direction: column;
   }
- 
+
   /* ── Header ── */
   header {
     background: var(--surface);
@@ -65,7 +65,7 @@
     letter-spacing: 0.08em;
     font-weight: 700;
   }
- 
+
   /* ── Main layout ── */
   main {
     flex: 1;
@@ -73,7 +73,7 @@
     grid-template-columns: 360px 1fr;
     gap: 0;
   }
- 
+
   /* ── Sidebar (設定) ── */
   aside {
     background: var(--surface);
@@ -92,7 +92,7 @@
     color: var(--text-dim);
     margin-bottom: 12px;
   }
- 
+
   label { display: block; font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
   input[type="text"], input[type="time"], input[type="url"], textarea {
     width: 100%;
@@ -111,9 +111,9 @@
     outline: none;
     border-color: var(--accent);
   }
- 
+
   .form-row { margin-bottom: 14px; }
- 
+
   .toggle-row {
     display: flex;
     align-items: center;
@@ -141,7 +141,7 @@
     transition: transform 0.2s;
   }
   .toggle.on::after { transform: translateX(18px); }
- 
+
   .btn {
     display: inline-flex;
     align-items: center;
@@ -173,7 +173,7 @@
     border: 1px solid var(--border);
   }
   .btn-secondary:hover { border-color: var(--text-dim); }
- 
+
   /* ── Schedule Panel ── */
   .content {
     padding: 28px;
@@ -181,7 +181,7 @@
     flex-direction: column;
     gap: 24px;
   }
- 
+
   .schedule-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -211,7 +211,7 @@
   .schedule-card.danger::before { background: var(--accent); }
   .schedule-card:hover { border-color: var(--text-dim); transform: translateY(-2px); }
   .schedule-card.selected { border-color: var(--accent); }
- 
+
   .card-time {
     font-family: 'JetBrains Mono', monospace;
     font-size: 22px;
@@ -246,7 +246,7 @@
   }
   .schedule-card:hover .card-delete { opacity: 1; }
   .card-delete:hover { color: var(--accent); }
- 
+
   .btn-card-enter {
     display: block;
     width: 100%;
@@ -268,7 +268,7 @@
     border-color: var(--ok);
     transform: translateY(-1px);
   }
- 
+
   /* ── Timeline ── */
   .timeline {
     background: var(--surface);
@@ -317,9 +317,9 @@
   }
   .countdown-display.ok { color: var(--ok); }
   .countdown-display.warn { color: var(--warn); }
- 
+
   .countdown-display.danger { color: var(--accent); }
- 
+
   /* ── Log ── */
   .log-panel {
     background: var(--surface);
@@ -343,7 +343,7 @@
   .log-entry.ok .log-msg { color: var(--ok); }
   .log-entry.warn .log-msg { color: var(--warn); }
   .log-entry.danger .log-msg { color: var(--accent); }
- 
+
   /* ── ALERT OVERLAY ── */
   .overlay {
     display: none;
@@ -354,7 +354,7 @@
     justify-content: center;
   }
   .overlay.show { display: flex; }
- 
+
   .overlay-bg {
     position: absolute;
     inset: 0;
@@ -392,7 +392,7 @@
     50% { box-shadow: 0 0 0 20px rgba(255,68,68,0); }
   }
   .alert-box.urgent { animation: alertIn 0.3s cubic-bezier(0.34,1.56,0.64,1), pulse-red 1s infinite 0.3s; }
- 
+
   .alert-icon { font-size: 56px; margin-bottom: 16px; }
   .alert-level {
     font-size: 10px;
@@ -407,7 +407,7 @@
   .alert-level.warn { background: rgba(255,204,0,0.2); color: var(--warn); }
   .alert-level.danger { background: rgba(255,68,68,0.2); color: var(--accent); }
   .alert-level.critical { background: var(--accent); color: white; }
- 
+
   .alert-title {
     font-size: 24px;
     font-weight: 900;
@@ -452,7 +452,7 @@
   }
   .btn-snooze:hover { border-color: var(--text-dim); color: var(--text); }
   .snooze-count { font-size: 11px; color: var(--text-dim); }
- 
+
   /* ── Bomb alert ── */
   .bomb-overlay {
     display: none;
@@ -499,7 +499,7 @@
     from { transform: scale(1); }
     to { transform: scale(1.05); }
   }
- 
+
   /* ── Status bar ── */
   .status-bar {
     background: var(--surface);
@@ -518,7 +518,7 @@
     flex-shrink: 0;
   }
   .status-dot.inactive { background: var(--text-dim); }
- 
+
   .add-schedule-form {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -555,14 +555,14 @@
     transition: all 0.15s;
   }
   .btn-add:hover { background: #ff2222; }
- 
+
   .no-schedule {
     text-align: center;
     padding: 40px;
     color: var(--text-dim);
     font-size: 14px;
   }
- 
+
   @media (max-width: 768px) {
     main { grid-template-columns: 1fr; }
     aside { border-right: none; border-bottom: 1px solid var(--border); }
@@ -572,7 +572,7 @@
 </style>
 </head>
 <body>
- 
+
 <header>
   <div class="logo">
     <div class="logo-icon">🎯</div>
@@ -580,7 +580,7 @@
   </div>
   <div class="live-clock" id="liveClock">--:--:--</div>
 </header>
- 
+
 <main>
   <!-- Sidebar: Settings -->
   <aside>
@@ -588,7 +588,7 @@
       <div class="section-title">⚙ Discord 設定</div>
       <div class="form-row">
         <label>Webhook URL</label>
-        <input type="url" id="slackWebhook" placeholder="https://discord.com/api/webhooks/..." />
+        <input type="url" id="slackWebhook" placeholder="https://discord.com/api/webhooks/..." value="https://discord.com/api/webhooks/1513516736106987554/qTRJ4TA9b2iMWMqHvSs0JQsSONJHVEFw3Yt2atSRwVBUHoTDlIs_j2aTpFtGQH78iO8r" />
       </div>
       <div class="form-row">
         <label>上長の Discord メンション（例: @yamada または &lt;@123456789&gt;）</label>
@@ -599,9 +599,13 @@
         <input type="text" id="myName" placeholder="山田 太郎" value="" />
       </div>
     </div>
- 
+
     <div>
       <div class="section-title">🔔 アラート設定</div>
+      <div class="toggle-row">
+        <span class="toggle-label">5分前アラート</span>
+        <div class="toggle on" id="toggle5min" onclick="toggleSetting(this)"></div>
+      </div>
       <div class="toggle-row">
         <span class="toggle-label">3分前アラート</span>
         <div class="toggle on" id="toggle3min" onclick="toggleSetting(this)"></div>
@@ -623,7 +627,7 @@
         <div class="toggle on" id="toggle5after" onclick="toggleSetting(this)"></div>
       </div>
     </div>
- 
+
     <div>
       <div class="section-title">📋 入室メッセージ</div>
       <div class="form-row">
@@ -631,10 +635,10 @@
         <textarea id="enteredMsg" rows="3" placeholder="面接室に入室しました ✅">面接室に入室しました ✅</textarea>
       </div>
     </div>
- 
+
     <button class="btn btn-secondary" onclick="testSlack()">Discord 接続テスト</button>
   </aside>
- 
+
   <!-- Main content -->
   <div class="content">
     <!-- Add schedule -->
@@ -652,7 +656,7 @@
         <button class="btn-add" onclick="addSchedule()">追加</button>
       </div>
     </div>
- 
+
     <!-- Countdown for next interview -->
     <div class="timeline" id="countdownSection" style="display:none">
       <div class="timeline-title">📌 次の面接まで</div>
@@ -667,7 +671,7 @@
         <span id="tlEnd">--:--</span>
       </div>
     </div>
- 
+
     <!-- Schedule cards -->
     <div>
       <div class="section-title" style="padding:0 0 10px">📅 本日のスケジュール</div>
@@ -675,7 +679,7 @@
         <div class="no-schedule">面接スケジュールを追加してください</div>
       </div>
     </div>
- 
+
     <!-- Log -->
     <div class="log-panel" id="logPanel">
       <div class="section-title" style="margin-bottom:8px">📝 ログ</div>
@@ -683,12 +687,12 @@
     </div>
   </div>
 </main>
- 
+
 <div class="status-bar">
   <div class="status-dot" id="statusDot"></div>
   <span id="statusText">待機中 — 面接スケジュールを追加してください</span>
 </div>
- 
+
 <!-- Alert overlay -->
 <div class="overlay" id="alertOverlay">
   <div class="overlay-bg"></div>
@@ -704,17 +708,18 @@
     </div>
   </div>
 </div>
- 
+
 <!-- Bomb overlay (5min late) -->
 <div class="bomb-overlay" id="bombOverlay">
   <div style="font-size:80px">🚨</div>
   <div class="bomb-text" id="bombText">面接開始から5分経過！<br>至急確認してください！！</div>
   <div class="bomb-sub" id="bombSub">上長・メンバーへの緊急連絡を送信しました</div>
-  <button class="btn-bomb-ok" onclick="dismissBomb()">確認しました</button>
+  <button class="btn-bomb-ok" onclick="markEnteredFromBomb()" style="background:white;color:var(--accent);">✅ 入室した</button>
+  <button onclick="dismissBomb()" style="background:rgba(255,255,255,0.25);color:white;font-size:14px;font-weight:700;padding:10px 32px;border-radius:8px;border:2px solid rgba(255,255,255,0.5);cursor:pointer;font-family:'Noto Sans JP',sans-serif;">確認のみ（入室していない）</button>
 </div>
- 
+
 <audio id="alertSound"></audio>
- 
+
 <script>
 // ─── State ───────────────────────────────────────────
 let schedules = [];
@@ -723,7 +728,7 @@ let snoozeTimeouts = {};
 let tickInterval;
 let bombAudio = null;
 let snoozeCountLeft = 3;
- 
+
 // ─── Clock ───────────────────────────────────────────
 function updateClock() {
   const now = new Date();
@@ -732,14 +737,14 @@ function updateClock() {
   updateCountdown();
   updateCardStatuses();
 }
- 
+
 // ─── Schedule management ──────────────────────────────
 function addSchedule() {
   const timeInput = document.getElementById('newTime').value;
   const nameInput = document.getElementById('newName').value.trim();
- 
+
   if (!timeInput) { showToast('時刻を入力してください', 'warn'); return; }
- 
+
   const id = Date.now();
   schedules.push({
     id,
@@ -747,24 +752,24 @@ function addSchedule() {
     name: nameInput || '面接',
     entered: false
   });
-  activeAlerts[id] = { snoozeCount: 0, enteredAt: null, alert3fired: false, alert1fired: false, alert0fired: false, late3fired: false, late5fired: false };
- 
+  activeAlerts[id] = { snoozeCount: 0, enteredAt: null, alert5fired: false, alert3fired: false, alert1fired: false, alert0fired: false, late3fired: false, late5fired: false };
+
   document.getElementById('newTime').value = '';
   document.getElementById('newName').value = '';
- 
+
   schedules.sort((a,b) => a.time.localeCompare(b.time));
   renderSchedules();
   addLog(`「${nameInput || '面接'}」${timeInput} を追加しました`, 'ok');
   saveState();
 }
- 
+
 function removeSchedule(id) {
   schedules = schedules.filter(s => s.id !== id);
   delete activeAlerts[id];
   renderSchedules();
   saveState();
 }
- 
+
 function renderSchedules() {
   const grid = document.getElementById('scheduleGrid');
   if (schedules.length === 0) {
@@ -774,12 +779,12 @@ function renderSchedules() {
     document.getElementById('statusText').textContent = '待機中 — 面接スケジュールを追加してください';
     return;
   }
- 
+
   grid.innerHTML = schedules.map(s => {
     const state = activeAlerts[s.id] || {};
     let statusClass = '', statusLabel = '待機中';
     if (s.entered) { statusClass = 'ok'; statusLabel = '入室済み ✅'; }
- 
+
     return `
       <div class="schedule-card ${s.entered ? 'active' : ''}" id="card-${s.id}">
         <button class="card-delete" onclick="removeSchedule(${s.id})" title="削除">✕</button>
@@ -791,7 +796,7 @@ function renderSchedules() {
     `;
   }).join('');
 }
- 
+
 function updateCardStatuses() {
   const now = getNowMinutes();
   schedules.forEach(s => {
@@ -819,18 +824,18 @@ function updateCardStatuses() {
     }
   });
 }
- 
+
 // ─── Time utils ───────────────────────────────────────
 function getNowMinutes() {
   const now = new Date();
   return now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
 }
- 
+
 function timeToMinutes(timeStr) {
   const [h, m] = timeStr.split(':').map(Number);
   return h * 60 + m;
 }
- 
+
 function formatCountdown(diffMinutes) {
   const totalSeconds = Math.round(diffMinutes * 60);
   if (totalSeconds < 0) {
@@ -839,7 +844,7 @@ function formatCountdown(diffMinutes) {
   }
   return `${String(Math.floor(totalSeconds/60)).padStart(2,'0')}:${String(totalSeconds%60).padStart(2,'0')}`;
 }
- 
+
 // ─── Countdown ────────────────────────────────────────
 function updateCountdown() {
   const now = getNowMinutes();
@@ -848,23 +853,23 @@ function updateCountdown() {
     document.getElementById('countdownSection').style.display = 'none';
     return;
   }
- 
+
   const next = upcoming.reduce((a,b) => timeToMinutes(a.time) < timeToMinutes(b.time) ? a : b);
   const sm = timeToMinutes(next.time);
   const diff = sm - now;
- 
+
   document.getElementById('countdownSection').style.display = '';
   document.getElementById('tlStart').textContent = (() => { const t = new Date(); t.setHours(Math.floor(sm-30), (sm-30)%60*60%60,0); return `${String(Math.floor((sm-30)/60)).padStart(2,'0')}:${String(Math.floor((sm-30)%60)).padStart(2,'0')}`; })();
   document.getElementById('tlEnd').textContent = next.time;
- 
+
   const countEl = document.getElementById('countdownDisplay');
   countEl.textContent = formatCountdown(diff);
- 
+
   if (diff < 0) { countEl.className = 'countdown-display danger'; }
   else if (diff <= 1) { countEl.className = 'countdown-display danger'; }
   else if (diff <= 3) { countEl.className = 'countdown-display warn'; }
   else { countEl.className = 'countdown-display ok'; }
- 
+
   // timeline fill (30min window)
   const windowMin = 30;
   const elapsed = windowMin - diff;
@@ -875,7 +880,7 @@ function updateCountdown() {
   else if (diff <= 3) fill.style.background = 'var(--warn)';
   else fill.style.background = 'var(--ok)';
 }
- 
+
 // ─── Alert checks ─────────────────────────────────────
 function checkSchedules() {
   const now = getNowMinutes();
@@ -885,7 +890,13 @@ function checkSchedules() {
     if (!state) return;
     const sm = timeToMinutes(s.time);
     const diff = sm - now;  // positive = future, negative = past
- 
+
+    // 5分前
+    if (!state.alert5fired && diff <= 5 && diff > 3 && document.getElementById('toggle5min').classList.contains('on')) {
+      state.alert5fired = true;
+      snoozeCountLeft = 3;
+      showAlert(s, 'warn5', diff);
+    }
     // 3分前
     if (!state.alert3fired && diff <= 3 && diff > 1 && document.getElementById('toggle3min').classList.contains('on')) {
       state.alert3fired = true;
@@ -917,15 +928,15 @@ function checkSchedules() {
     }
   });
 }
- 
+
 // ─── Alert display ────────────────────────────────────
 let currentAlertSchedule = null;
 let currentAlertType = null;
- 
+
 function showAlert(schedule, type, diff) {
   currentAlertSchedule = schedule;
   currentAlertType = type;
- 
+
   const box = document.getElementById('alertBox');
   const icon = document.getElementById('alertIcon');
   const level = document.getElementById('alertLevel');
@@ -933,10 +944,18 @@ function showAlert(schedule, type, diff) {
   const sub = document.getElementById('alertSubtitle');
   const snoozeBtn = document.querySelector('.btn-snooze');
   const enteredBtn = document.getElementById('btnEntered');
- 
+
   box.className = 'alert-box';
- 
-  if (type === 'warn3') {
+
+  if (type === 'warn5') {
+    icon.textContent = '🔔';
+    level.className = 'alert-level warn'; level.textContent = '5分前';
+    title.textContent = `「${schedule.name}」まで5分前`;
+    sub.textContent = '面接まであと5分です。\n準備を始めてください。';
+    enteredBtn.style.display = 'none';
+    snoozeBtn.style.display = 'block';
+    playBeep(440, 0.4, 1);
+  } else if (type === 'warn3') {
     icon.textContent = '⏰';
     level.className = 'alert-level warn'; level.textContent = '3分前';
     title.textContent = `「${schedule.name}」まで3分前`;
@@ -972,18 +991,18 @@ function showAlert(schedule, type, diff) {
     snoozeBtn.style.display = 'none';
     playBeep(220, 1.0, 5);
   }
- 
+
   document.getElementById('snoozeCount').textContent = `(残り${snoozeCountLeft}回)`;
   document.getElementById('alertOverlay').classList.add('show');
   addLog(`アラート表示: ${title.textContent}`, type === 'warn3' ? 'warn' : 'danger');
 }
- 
+
 function dismissAlert() {
   document.getElementById('alertOverlay').classList.remove('show');
   currentAlertSchedule = null;
   currentAlertType = null;
 }
- 
+
 function markEntered() {
   if (!currentAlertSchedule) return;
   const s = currentAlertSchedule;
@@ -995,7 +1014,7 @@ function markEntered() {
   saveState();
   showToast('入室完了を記録しました ✅', 'ok');
 }
- 
+
 function markEnteredById(id) {
   const s = schedules.find(x => x.id === id);
   if (!s || s.entered) return;
@@ -1006,7 +1025,7 @@ function markEnteredById(id) {
   saveState();
   showToast('入室完了を記録しました ✅', 'ok');
 }
- 
+
 function snooze() {
   if (snoozeCountLeft <= 0) {
     showToast('スヌーズ回数の上限に達しました', 'warn');
@@ -1024,7 +1043,7 @@ function snooze() {
   }, 60 * 1000);
   showToast(`1分後に再アラートします（残り${snoozeCountLeft}回）`, 'warn');
 }
- 
+
 // ─── Bomb alert ───────────────────────────────────────
 function showBomb(schedule) {
   document.getElementById('bombText').innerHTML = `「${schedule.name}」開始から5分経過！！<br>至急確認してください！！`;
@@ -1033,7 +1052,23 @@ function showBomb(schedule) {
   addLog(`🚨 爆音アラート: 「${schedule.name}」+5分経過`, 'danger');
   startBombSound();
 }
- 
+
+function markEnteredFromBomb() {
+  // 未入室の面接の中で最も遅刻しているものを入室済みにする
+  const now = getNowMinutes();
+  const late = schedules.filter(s => !s.entered && timeToMinutes(s.time) <= now);
+  if (late.length > 0) {
+    const target = late.reduce((a,b) => timeToMinutes(a.time) < timeToMinutes(b.time) ? a : b);
+    target.entered = true;
+    renderSchedules();
+    addLog(`「${target.name}」入室完了 ✅（爆音アラートから）`, 'ok');
+    sendSlack(target, 'entered');
+    saveState();
+    showToast('入室完了を記録しました ✅', 'ok');
+  }
+  dismissBomb();
+}
+
 function dismissBomb() {
   document.getElementById('bombOverlay').classList.remove('show');
   stopBombSound();
@@ -1042,16 +1077,16 @@ function dismissBomb() {
     showAlert(currentAlertSchedule, 'late3', -5);
   }
 }
- 
+
 // ─── Sound ───────────────────────────────────────────
 let audioCtx = null;
 let bombNodes = [];
- 
+
 function getAudioCtx() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return audioCtx;
 }
- 
+
 function playBeep(freq, vol, times) {
   try {
     const ctx = getAudioCtx();
@@ -1068,7 +1103,7 @@ function playBeep(freq, vol, times) {
     }
   } catch(e) {}
 }
- 
+
 function startBombSound() {
   try {
     const ctx = getAudioCtx();
@@ -1091,24 +1126,24 @@ function startBombSound() {
     beepLoop();
   } catch(e) {}
 }
- 
+
 function stopBombSound() {
   bombNodes.forEach(clearTimeout);
   bombNodes = [];
 }
- 
+
 // ─── Slack ────────────────────────────────────────────
 async function sendSlack(schedule, type) {
-  const webhook = document.getElementById('slackWebhook').value.trim();
+  const webhook = document.getElementById('slackWebhook').value.trim() || "https://discord.com/api/webhooks/1513516736106987554/qTRJ4TA9b2iMWMqHvSs0JQsSONJHVEFw3Yt2atSRwVBUHoTDlIs_j2aTpFtGQH78iO8r";
   const manager = document.getElementById('managerMention').value.trim() || '@上長';
   const myName = document.getElementById('myName').value.trim() || '担当者';
   const enteredMsg = document.getElementById('enteredMsg').value.trim();
- 
+
   let content = '';
   let color = 0x00d084;
   let title = '';
   let description = '';
- 
+
   if (type === 'entered') {
     title = '✅ 入室完了';
     description = `**${myName}** が「${schedule.name}」(${schedule.time}) に入室しました。\n${enteredMsg}`;
@@ -1125,14 +1160,14 @@ async function sendSlack(schedule, type) {
     color = 0xff4444;
     content = manager;
   }
- 
+
   addLog(`Discord送信: ${title}`, type === 'entered' ? 'ok' : 'danger');
- 
+
   if (!webhook) {
     addLog('⚠ Webhook URLが未設定のため、Discord送信はスキップ', 'warn');
     return;
   }
- 
+
   const body = {
     content,
     embeds: [{
@@ -1143,7 +1178,7 @@ async function sendSlack(schedule, type) {
       footer: { text: '面接アラートシステム' }
     }]
   };
- 
+
   try {
     const res = await fetch(webhook, {
       method: 'POST',
@@ -1162,9 +1197,9 @@ async function sendSlack(schedule, type) {
     showToast('Discord送信エラー (URL確認)', 'danger');
   }
 }
- 
+
 async function testSlack() {
-  const webhook = document.getElementById('slackWebhook').value.trim();
+  const webhook = document.getElementById('slackWebhook').value.trim() || "https://discord.com/api/webhooks/1513516736106987554/qTRJ4TA9b2iMWMqHvSs0JQsSONJHVEFw3Yt2atSRwVBUHoTDlIs_j2aTpFtGQH78iO8r";
   if (!webhook) { showToast('Webhook URLを入力してください', 'warn'); return; }
   const myName = document.getElementById('myName').value.trim() || '担当者';
   try {
@@ -1192,12 +1227,12 @@ async function testSlack() {
     showToast('送信失敗: ' + e.message, 'danger');
   }
 }
- 
+
 // ─── Toggle ───────────────────────────────────────────
 function toggleSetting(el) {
   el.classList.toggle('on');
 }
- 
+
 // ─── Log ─────────────────────────────────────────────
 function addLog(msg, type = '') {
   const now = new Date().toLocaleTimeString('ja-JP');
@@ -1208,7 +1243,7 @@ function addLog(msg, type = '') {
   entries.prepend(div);
   if (entries.children.length > 50) entries.removeChild(entries.lastChild);
 }
- 
+
 // ─── Toast ───────────────────────────────────────────
 let toastTimeout;
 function showToast(msg, type) {
@@ -1230,17 +1265,17 @@ function showToast(msg, type) {
   clearTimeout(toastTimeout);
   toastTimeout = setTimeout(() => toast.style.opacity = '0', 3000);
 }
- 
+
 // ─── Persist ─────────────────────────────────────────
 function saveState() {
   try {
     sessionStorage.setItem('ias_schedules', JSON.stringify(schedules.map(s => ({...s, id: s.id}))));
-    sessionStorage.setItem('ias_webhook', document.getElementById('slackWebhook').value);
-    sessionStorage.setItem('ias_manager', document.getElementById('managerMention').value);
-    sessionStorage.setItem('ias_name', document.getElementById('myName').value);
+    localStorage.setItem('ias_webhook', document.getElementById('slackWebhook').value);
+    localStorage.setItem('ias_manager', document.getElementById('managerMention').value);
+    localStorage.setItem('ias_name', document.getElementById('myName').value);
   } catch(e) {}
 }
- 
+
 function loadState() {
   try {
     const saved = sessionStorage.getItem('ias_schedules');
@@ -1248,20 +1283,20 @@ function loadState() {
       schedules = JSON.parse(saved);
       schedules.forEach(s => {
         if (!activeAlerts[s.id]) {
-          activeAlerts[s.id] = { snoozeCount: 0, enteredAt: null, alert3fired: false, alert1fired: false, alert0fired: false, late3fired: false, late5fired: false };
+          activeAlerts[s.id] = { snoozeCount: 0, enteredAt: null, alert5fired: false, alert3fired: false, alert1fired: false, alert0fired: false, late3fired: false, late5fired: false };
         }
       });
       renderSchedules();
     }
-    const wh = sessionStorage.getItem('ias_webhook');
-    const mg = sessionStorage.getItem('ias_manager');
-    const nm = sessionStorage.getItem('ias_name');
+    const wh = localStorage.getItem('ias_webhook');
+    const mg = localStorage.getItem('ias_manager');
+    const nm = localStorage.getItem('ias_name');
     if (wh) document.getElementById('slackWebhook').value = wh;
     if (mg) document.getElementById('managerMention').value = mg;
     if (nm) document.getElementById('myName').value = nm;
   } catch(e) {}
 }
- 
+
 // ─── Status bar update ────────────────────────────────
 function updateStatus() {
   const now = getNowMinutes();
@@ -1279,7 +1314,7 @@ function updateStatus() {
   else if (diff <= 3) { dot.style.background = 'var(--warn)'; text.textContent = `⚠️ 「${next.name}」まで約${Math.ceil(diff)}分`; }
   else { dot.style.background = 'var(--ok)'; text.textContent = `次の面接: 「${next.name}」${next.time} (あと${Math.floor(diff)}分)`; }
 }
- 
+
 // ─── Auto-add today demo (dev helper) ─────────────────
 // Optionally pre-fill next 30min slot for demo
 function prefillDemo() {
@@ -1289,14 +1324,19 @@ function prefillDemo() {
   document.getElementById('newTime').value = `${String(next.getHours()).padStart(2,'0')}:${String(next.getMinutes()).padStart(2,'0')}`;
   document.getElementById('newName').value = '田中 一郎（新卒候補）';
 }
- 
+
 // ─── Init ─────────────────────────────────────────────
 loadState();
 prefillDemo();
 tickInterval = setInterval(() => { updateClock(); updateStatus(); }, 1000);
 updateClock();
 addLog('システム起動', 'ok');
+
+// Auto-save settings on change
+['slackWebhook','managerMention','myName','enteredMsg'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', saveState);
+});
 </script>
 </body>
 </html>
- 
